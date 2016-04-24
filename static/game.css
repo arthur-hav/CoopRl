@@ -1,0 +1,101 @@
+body {
+    background:#222222;
+}
+
+.game-container {
+    width:910px;
+    margin:auto;
+}
+
+#rogue_board {
+    color:#aaaaaa;
+    font-weight:bold;
+    font-size:24px;
+    text-align:center;
+
+    width:560px;
+    height:600px;
+    position:relative;
+    float:left;
+}
+
+#rogue_board table {
+    position:absolute;
+    top:0;
+    border-collapse:collapse;
+}
+
+#rogue_board table td{
+    height:32px;
+    width:32px;
+}
+
+#rogue_board table th{
+    height:16px;
+}
+#rogue_board .padding {
+    height:32px;
+    width:16px;
+}
+#rogue_board .cell {
+    border-radius:32px;
+    width:100%;
+    height:100%;
+}
+#rogue_board .ennemy:hover{
+    box-shadow:0 0 4px #dd2222;
+}
+#rogue_board .ally{
+    box-shadow:0 0 4px #22dd22;
+}
+
+#gui {
+    float:left;
+    height:510px;
+    width:280px;
+}
+.p-bar {
+    transition: all 0.05s linear 0s;
+    text-align: center;
+    font-size: 11px;
+    line-height: 13px;
+    height:13px;
+    border-radius:4px;
+}
+.p-bg {
+    border:1px solid #aaaaaa;
+    height:28px;
+    background-color:#666666;
+    border-radius:5px;
+}
+.red {
+    background-color:#aa2222;
+}
+.green {
+    background-color:#22aa22;
+}
+.blue {
+    background-color:#226699;
+}
+#hover_popup{
+    display:none;
+    opacity:0.8;
+    position:absolute;
+    background:transparent;
+    width:64px;
+    height:80px;
+}
+.popup-bar{
+    transition: all 0.05s linear 0s;
+    text-align: center;
+    font-size: 11px;
+    line-height: 9px;
+    height:9px;
+    border-radius:3px;
+}
+.popup-bg {
+    border:1px solid #666666;
+    height:20px;
+    background:transparent;
+    border-radius:4px;
+}
