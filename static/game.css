@@ -41,11 +41,12 @@ body {
     border-radius:32px;
     width:100%;
     height:100%;
+    position:relative;
 }
 #rogue_board .ennemy:hover{
     box-shadow:0 0 4px #dd2222;
 }
-#rogue_board .ally{
+#rogue_board .ally:hover{
     box-shadow:0 0 4px #22dd22;
 }
 
@@ -98,4 +99,123 @@ body {
     height:20px;
     background:transparent;
     border-radius:4px;
+}
+.red {
+    background-color:#aa2222;
+}
+.green {
+    background-color:#22aa22;
+}
+.blue {
+    background-color:#226699;
+}
+#hover_popup{
+    display:none;
+    opacity:0.8;
+    position:absolute;
+    background:transparent;
+    width:64px;
+    height:80px;
+}
+.popup-bar{
+    transition: all 0.05s linear 0s;
+    text-align: center;
+    font-size: 11px;
+    line-height: 9px;
+    height:9px;
+    border-radius:3px;
+}
+.popup-bg {
+    border:1px solid #666666;
+    height:20px;
+    background:transparent;
+    border-radius:4px;
+}
+#remap_popup{
+    display:none;
+    position:absolute;
+    width:150px;
+    height:100px;
+    background-color:#666666;
+}
+#remap_popup tr td{
+    text-align:center;
+}
+.popup-map{
+    display:inline-block;
+    width:28px;
+    height:28px;
+    border:2px solid #888888;
+    line-height:28px;
+}
+#minimap-ctn {
+    width:132px;
+    height:132px;
+    border:2px solid #888888;
+    margin:10px auto;
+}
+#equipment {
+    position:relative;
+}
+.wpn1 {
+    position:absolute;
+    top:0;
+    left:0;
+}
+.wpn2 {
+    position:absolute;
+    top:40px;
+    left:0;
+}
+.wpn3 {
+    position:absolute;
+    top:80px;
+    left:0;
+}
+.mod1 {
+    position:absolute;
+    top:20px;
+    left:60px;
+}
+.mod2 {
+    position:absolute;
+    top:120px;
+    left:60px;
+}
+#preloader {
+    display:none;
+    margin-top:200px;
+    text-align:center;
+}
+#startbtn {
+    display:none;
+    border:2px solid white;
+    padding:8px 12px;
+}
+#startbtn:hover{
+    background-color:#888888;
+}
+
+.floor {
+    background-image:url("img/Sol/SolMetal2.png")
+}
+.cell.darkness {
+    background-image:none; 
+    background-color:#000000; 
+}
+.foreground,.background {
+    width:32px;
+    height:32px;
+    position:absolute;
+    top:0;
+    left:0;
+}
+.zombie {
+    background-image:url("img/Zombies/Zombie01.png");
+}
+.robot {
+    background-image:url("img/PersoJoueur.png");
+}
+.corpse {
+    background-image:url("img/KdavreZombie.png");
 }

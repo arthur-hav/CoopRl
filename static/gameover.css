@@ -1,0 +1,23 @@
+body {
+    background:#222222;
+    text-align:center;
+}
+h1.gameover {
+    color: #dd1111;
+    text-align:center;
+    margin-top:200px;
+}
+div.replay {
+    display:inline-block;
+    border:2px solid white;
+    padding:8px 12px;
+}
+a div.replay {
+    color:white;
+}
+div.replay:hover{
+    background-color:#888888;
+}
+.replay h3{
+    margin:0
+}

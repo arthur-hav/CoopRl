@@ -13,17 +13,47 @@
         <div id="rogue_board"></div>
         <div id="gui">
             <div class="p-bg">
-                <div class="p-bar red"> </div>
-                <div class="p-bar blue"> </div>
+                <div id="health_bar" class="p-bar red"> </div>
+                <div id="energy_bar" class="p-bar blue"> </div>
             </div> 
-            <div class="p-bar green"> </div>
+            <div id="lives-text"></div>
+            <div onclick="popup_remap_keys();" >Remap keys</div>
+            <table id="remap_popup">
+                <tr>
+                    <td><div id="top-left" class="popup-map" onclick="capture_key(5)"></div></td>
+                    <td><div id="top-center" class="popup-map" onclick="capture_key(0)"></div></td>
+                    <td><div id="top-right" class="popup-map" onclick="capture_key(1)"></div></td>
+                </tr>
+                <tr>
+                    <td><div id="bottom-left" class="popup-map" onclick="capture_key(4)"></div></td>
+                    <td><div id="bottom-center" class="popup-map" onclick="capture_key(3)"></div></td>
+                    <td><div id="bottom-right" class="popup-map" onclick="capture_key(2)"></div></td>
+                </tr>
+            </table>
+            <div id="minimap-ctn">
+                <canvas id="minimap"></canvas>
+            </div>
+            <div id="equipment">
+                <img src="img/interface/arme1.png" class="wpn1"></img>
+                <img src="img/interface/arme2.png" class="wpn2"></img>
+                <img src="img/interface/arme3.png" class="wpn3"></img>
+                <img src="img/interface/Module.png" class="mod1"></img>
+                <img src="img/interface/Module.png" class="mod2"></img>
+            </div>
         </div>
+    </div>
+    <div id="preloader">
+        <h1>Waiting for opponents <span class="playnum"></span></h1>
+        <h3 id="startbtn" onclick="send_start();">Start now</h3>
     </div>
     <div id="hover_popup">
         <div class="popup-bg">
             <div class="popup-bar red"> </div>
             <div class="popup-bar blue"> </div>
         </div>
+    </div>
+    <div id="img_cache">
+        <div class="floor cell hide"></div>
     </div>
 </body>
 

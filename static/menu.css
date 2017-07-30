@@ -1,0 +1,23 @@
+body {
+    background:#222222;
+    text-align:center;
+}
+h1.title {
+    color: #11dd11;
+    text-align:center;
+    margin-top:200px;
+}
+div.menubtn {
+    display:inline-block;
+    border:2px solid white;
+    padding:8px 12px;
+}
+a div.menubtn {
+    color:white;
+}
+div.menubtn:hover{
+    background-color:#888888;
+}
+.menubtn h3{
+    margin:0
+}
