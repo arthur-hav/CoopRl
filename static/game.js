@@ -1,8 +1,12 @@
 var cells = []
-var creatures = {}
+var mapentities = {}
 var centerx, centery;
 var tiles = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
+
+//PC is standing on (8, 7)
 var STEPS = [[8,6], [9,6], [9,7], [8,8], [7,7], [7,6]]
+var DIAGONAL_STEPS = [[9,5], [10,7], [9,8], [7,8], [6,7], [7,5]]
+
 var COLS = [5,8,11,12,13,14,15,14,15,14,15,14,13,12,11,8,5]
 var MOVE_KEYS = ['p','o','e','i','u',decodeURIComponent(escape('é'))]
 var hovered = null
@@ -48,7 +52,6 @@ function hover_update(cr){
     var rect = cells[cr.x][cr.y][0].getBoundingClientRect()
     $("#hover_popup").css("left",rect.right).css("top",rect.top)
     $("#hover_popup .popup-bar.red").width(cr.health*100/cr.max_health+"%").text(Math.round(cr.health))
-    $("#hover_popup .popup-bar.blue").width(cr.energy*100/cr.max_energy+"%").text(Math.round(cr.energy))
     if (cr.health <= 0 || tiles[cr.x][cr.y] == "_"){
         $("#hover_popup").fadeOut(300);hovered=null;
     }
@@ -84,10 +87,9 @@ function on_recv(event) {
     }
     for (i in jdata.board)
         for (j=0;j<jdata.board[i].length;j++){
-            $(".background", cells[i][j]).remove()
             tiles[i][j] = jdata.board[i][j];
             var chr = tiles[i][j];
-            cells[i][j].removeClass("darkness floor wall");
+            cells[i][j].removeClass("ennemy darkness floor wall");
             switch (chr){
                case '_':
                    cells[i][j].addClass("darkness");
@@ -95,15 +97,11 @@ function on_recv(event) {
                case ' ':
                    cells[i][j].addClass("floor");
                    break;
-               case '%':
-                   cells[i][j].addClass("floor");
-                   cells[i][j].append("<div class='background corpse'></div>");
-                   break;
                case '#':
                    cells[i][j].addClass("wall");
                    break;
-               cells[i][j].removeClass("ally ennemy").unbind("mouseover mouseout click");
             }
+            cells[i][j].unbind("mouseover mouseout");
         }
     for (wall in jdata.map){
         var ctx = $("#minimap")[0].getContext("2d");
@@ -124,58 +122,42 @@ function on_recv(event) {
     if (jdata.lives) 
         $("#lives-text").text("Lives: "+jdata.lives);
     if (hovered)
-        hover_update(creatures[hovered])
-    for (i in jdata.creatures){
-        cr = jdata.creatures[i];
-        if (!creatures[i] || cr.reset)
-            creatures[i] = cr;
+        hover_update(mapentities[hovered])
+    for (i in jdata.mapentities){
+        var ent = jdata.mapentities[i];
+        if (!mapentitities[i] || ent.reset)
+            mapentities[i] = ent;
         else
             for (j in cr)
-                creatures[i][j] = cr[j];
+                mapentities[i][j] = cr[j];
     }
     $(".foreground").remove()
-    for (i in creatures){
-        x = creatures[i].x;
-        y = creatures[i].y;
+    for (i in mapentities){
+        x = mapentities[i].x;
+        y = mapentities[i].y;
         if (x == 8 && y == 7)
-            pc = creatures[i]
-        if (creatures[i].health > 0 && tiles[x][y] != '_'){
-            cells[x][y].append("<div class='foreground "+creatures[i].jclass+"'></div>")
-            cells[x][y].on("mouseover", {cr:creatures[i]}, hover_popin);
-            cells[x][y].on("mouseout", function(){$("#hover_popup").fadeOut(300);hovered=null;})
-            if (creatures[i].is_pc){
-                cells[x][y].addClass("ally")
-                continue
-            }
+            pc = mapentities[i]
+        else {
             cells[x][y].addClass("ennemy")
-            cells[x][y].click({cr:creatures[i]}, function(event){
-                var o = { attack: {x: event.data.cr.x, y: event.data.cr.y}};
-                ws.send(JSON.stringify(o));
-            });
+        }
+        if (mapentities[i].health > 0 && tiles[x][y] != '_' && mapentities[i].image ){
+            cells[x][y].append("<img class='foreground' src='"+mapentities[i].image+"'></img>")
+            cells[x][y].on("mouseover", {cr:mapentities[i]}, hover_popin);
+            cells[x][y].on("mouseout", function(){$("#hover_popup").fadeOut(300);hovered=null;})
         }
     }
     if (pc){
         $("#health_bar").width(pc.health*100/pc.max_health+"%").text(Math.round(pc.health))
-        $("#energy_bar").width(pc.energy*100/pc.max_energy+"%").text(Math.round(pc.energy))
-        //pc.ap
-        for (i in pc.short_steps){
-            var step = STEPS[pc.short_steps[i]];
-            if (tiles[step[0]][step[1]] == '#')
-                continue
-            var addclass = true
-            for (j in creatures)
-                if (creatures[j].x == step[0] && creatures[j].y == step[1] 
-                        && creatures[j].health > 0){
-                    addclass = false
-                    break
-                }
-            //if (addclass)
-                //cells[step[0]][step[1]].addClass("ally");
+        if (pc.ap >= 4){
+            for (i in STEPS)
+                cells[STEPS[i][0]][STEPS[i][1]].addClass('step');
+        }
+        if (pc.ap >= 7){
+            for (i in DIAGONAL_STEPS)
+                cells[DIAGONAL_STEPS[i][0]][DIAGONAL_STEPS[i][1]].addClass('d-step');
         }
     }
     //$("div.p-bar.green").width((pc.ap*100/12.0)+"%").text(pc.ap)
-    for (i in STEPS)
-        cells[STEPS[i][0]][STEPS[i][1]].removeClass("ally");
 }
 
 function gen_table() {
@@ -188,6 +170,7 @@ function gen_table() {
     for (i in COLS)
         for (j = 0; j < COLS[i]; j++)
             cells[i].push($('table:eq('+i+') div.cell:eq('+j+')'));
+
 }
 
 function game_keydown (ev){
@@ -202,11 +185,29 @@ function game_keydown (ev){
 
 $(document).ready (function (){
     gen_table();
+    for (i in cells){
+        for (j in cells[i]){
+            cells[i][j].click({x:i, y:j}, 
+                function(event){
+                    var o = {x: event.data.x, y:event.data.y}
+                    if (cells[i][j].hasClass('ennemy')) {
+                        o.action = 'attack';
+                    }
+                    else if (cells[i][j].hasClass('step')) {
+                        o.action = 'step';
+                    }
+                    else if (cells[i][j].hasClass('d-step')){
+                        o.action = 'diagonal_step'
+                    }
+                    ws.send(JSON.stringify(o));
+            });
+        }
+    }
     if ("WebSocket" in window){
         //ws = new WebSocket("ws://192.168.0.24:8888/socket");
         //ws = new WebSocket("ws://195.154.45.210:8888/socket");
         ws = new WebSocket("ws://localhost:8888/socket");
     }
     ws.onmessage = on_recv
-    $(document).keydown (game_keydown);
+    //$(document).keydown (game_keydown);
 });

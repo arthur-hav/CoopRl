@@ -43,11 +43,14 @@ body {
     height:100%;
     position:relative;
 }
-#rogue_board .ennemy:hover{
+#rogue_board .ennemy{
     box-shadow:0 0 4px #dd2222;
 }
-#rogue_board .ally:hover{
+#rogue_board .step{
     box-shadow:0 0 4px #22dd22;
+}
+#rogue_board .d-step{
+    box-shadow:0 0 4px #44dd44;
 }
 
 #gui {
@@ -68,15 +71,6 @@ body {
     height:28px;
     background-color:#666666;
     border-radius:5px;
-}
-.red {
-    background-color:#aa2222;
-}
-.green {
-    background-color:#22aa22;
-}
-.blue {
-    background-color:#226699;
 }
 #hover_popup{
     display:none;
@@ -197,10 +191,11 @@ body {
 }
 
 .floor {
-    background-image:url("img/Sol/SolMetal2.png")
+}
+.cell.wall {
+    background-color:#888888; 
 }
 .cell.darkness {
-    background-image:none; 
     background-color:#000000; 
 }
 .foreground,.background {
@@ -210,12 +205,4 @@ body {
     top:0;
     left:0;
 }
-.zombie {
-    background-image:url("img/Zombies/Zombie01.png");
-}
-.robot {
-    background-image:url("img/PersoJoueur.png");
-}
-.corpse {
-    background-image:url("img/KdavreZombie.png");
-}
+

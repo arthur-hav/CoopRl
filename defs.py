@@ -2,19 +2,26 @@ robot = {
 "health":110, "energy":100,
 "mr":3, "armor":3,
 "ad":18, "attack_range":1,
-"jclass":"robot" }
+"image":"img/PersoJoueur.png" 
+}
 
 zombie = {
 "health":60, "energy":100,
 "mr":2, "armor":2,
 "ad":3, "attack_range":1,
-"jclass":"zombie" }
+"image":"img/Zombies/Zombie01.png" 
+}
 
 archer_skeleton = {
 "health":30, "energy":100,
 "mr":0, "armor":2,
 "ad":2, "attack_range":4,
-"jclass":"skeleton" }
+"image":"img/Zombies/Zombie02.png" 
+}
+
+body = {
+"image":"img/KdavreZombie.png"
+}
 
 knife = {
 "slot":"weapon"
