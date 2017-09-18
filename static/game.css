@@ -42,14 +42,15 @@ body {
     width:100%;
     height:100%;
     position:relative;
+    background-position: center;
 }
-#rogue_board .ennemy{
+#rogue_board .cell.ennemy{
     box-shadow:0 0 4px #dd2222;
 }
-#rogue_board .step{
+#rogue_board .cell.step{
     box-shadow:0 0 4px #22dd22;
 }
-#rogue_board .d-step{
+#rogue_board .cell.d-step{
     box-shadow:0 0 4px #44dd44;
 }
 
@@ -190,12 +191,7 @@ body {
     background-color:#888888;
 }
 
-.floor {
-}
-.cell.wall {
-    background-color:#888888; 
-}
-.cell.darkness {
+.darkness {
     background-color:#000000; 
 }
 .foreground,.background {

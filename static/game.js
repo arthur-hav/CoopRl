@@ -1,7 +1,8 @@
 var cells = []
+
 var mapentities = {}
 var centerx, centery;
-var tiles = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
+var losmap = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
 
 //PC is standing on (8, 7)
 var STEPS = [[8,6], [9,6], [9,7], [8,8], [7,7], [7,6]]
@@ -48,20 +49,28 @@ function capture_key (index) {
         });
 }
 
-function hover_update(cr){
-    var rect = cells[cr.x][cr.y][0].getBoundingClientRect()
-    $("#hover_popup").css("left",rect.right).css("top",rect.top)
-    $("#hover_popup .popup-bar.red").width(cr.health*100/cr.max_health+"%").text(Math.round(cr.health))
-    if (cr.health <= 0 || tiles[cr.x][cr.y] == "_"){
-        $("#hover_popup").fadeOut(300);hovered=null;
+function hover_update(){
+    var cr = mapentities[hovered];
+    if (!cr || cr.health <= 0 || !losmap[cr.x][cr.y]){
+        $("#hover_popup").fadeOut(300);
+        hovered=null;
+    }
+    else {
+        var rect = cells[cr.x][cr.y][0].getBoundingClientRect()
+        $("#hover_popup").css("left",rect.right).css("top",rect.top)
+        $("#hover_popup .popup-bar.red").width(cr.health*100/cr.max_health+"%").text(Math.round(cr.health))
     }
 }
 
 function hover_popin (event){
-    var cr = event.data.cr
-    hovered = cr.id
-    $("#hover_popup").stop(true, true).fadeIn(300)
-    hover_update(cr)
+    hovered = null
+    for (var cr_id in mapentities){
+        if (mapentities[cr_id].x == event.data.x && mapentitites[i].y == event.data.y) {
+           hovered = cr_id
+           $("#hover_popup").stop(true, true).fadeIn(300)
+           hover_update()
+        }
+    }
 }
 
 function send_start (){
@@ -69,6 +78,7 @@ function send_start (){
 }
 
 function on_recv(event) {
+    //console.log(event.data)
     var jdata = JSON.parse (event.data);
     if (jdata.game == "over")
         window.location = "gameover.html"; 
@@ -85,29 +95,25 @@ function on_recv(event) {
         $("#preloader").hide();
         $("#startbtn").hide();
     }
-    for (i in jdata.board)
-        for (j=0;j<jdata.board[i].length;j++){
-            tiles[i][j] = jdata.board[i][j];
-            var chr = tiles[i][j];
-            cells[i][j].removeClass("ennemy darkness floor wall");
-            switch (chr){
-               case '_':
-                   cells[i][j].addClass("darkness");
-                   break;
-               case ' ':
-                   cells[i][j].addClass("floor");
-                   break;
-               case '#':
-                   cells[i][j].addClass("wall");
-                   break;
-            }
-            cells[i][j].unbind("mouseover mouseout");
-        }
+    console.log(jdata);
+    for (var i in jdata.lit){
+        var c = jdata.lit[i];
+        cells[c[0]][c[1]].parent().removeClass("darkness")
+        cells[c[0]][c[1]].addClass("floor")
+    }
+    for (i in jdata.unlit){
+        var c = jdata.unlit[i]
+        cells[c[0]][c[1]].parent().addClass("darkness")
+    }
+    //cells[i][j].removeClass("ennemy darkness floor wall");
+    
+    /*
     for (wall in jdata.map){
         var ctx = $("#minimap")[0].getContext("2d");
         ctx.fillStyle = "#888888";
         ctx.fillRect (62+4*jdata.map[wall][0], 62+4*jdata.map[wall][1],4,4);
     }
+    */
     if (jdata.center) {
         var ctx = $("#minimap")[0].getContext("2d");
         ctx.fillStyle = "#222222";
@@ -121,29 +127,30 @@ function on_recv(event) {
     }
     if (jdata.lives) 
         $("#lives-text").text("Lives: "+jdata.lives);
-    if (hovered)
-        hover_update(mapentities[hovered])
+    hover_update()
     for (i in jdata.mapentities){
         var ent = jdata.mapentities[i];
-        if (!mapentitities[i] || ent.reset)
+        if (!mapentities[i] || ent.reset)
             mapentities[i] = ent;
         else
-            for (j in cr)
-                mapentities[i][j] = cr[j];
+            for (j in ent)
+                mapentities[i][j] = ent[j];
     }
     $(".foreground").remove()
     for (i in mapentities){
-        x = mapentities[i].x;
-        y = mapentities[i].y;
+        var x = mapentities[i].x;
+        var y = mapentities[i].y;
         if (x == 8 && y == 7)
             pc = mapentities[i]
-        else {
+        else if ('ap' in mapentities[i]) {
             cells[x][y].addClass("ennemy")
         }
-        if (mapentities[i].health > 0 && tiles[x][y] != '_' && mapentities[i].image ){
+        if (mapentities[i].image ){
+            cells[x][y].removeClass('floor')
             cells[x][y].append("<img class='foreground' src='"+mapentities[i].image+"'></img>")
-            cells[x][y].on("mouseover", {cr:mapentities[i]}, hover_popin);
-            cells[x][y].on("mouseout", function(){$("#hover_popup").fadeOut(300);hovered=null;})
+            //cells[x][y].css('background-image', 'url(' + mapentities[i].image + ')')
+            //cells[x][y].on("mouseover", {x:x, y:y}, hover_popin);
+            //cells[x][y].on("mouseout", function(){$("#hover_popup").fadeOut(300);hovered=null;})
         }
     }
     if (pc){
@@ -173,16 +180,6 @@ function gen_table() {
 
 }
 
-function game_keydown (ev){
-    for (i in MOVE_KEYS){
-        if (MOVE_KEYS[i] == ev.key){
-            var o = {step: i}
-            ws.send(JSON.stringify(o));
-            break;
-        }
-    }
-}
-
 $(document).ready (function (){
     gen_table();
     for (i in cells){
@@ -190,15 +187,17 @@ $(document).ready (function (){
             cells[i][j].click({x:i, y:j}, 
                 function(event){
                     var o = {x: event.data.x, y:event.data.y}
-                    if (cells[i][j].hasClass('ennemy')) {
+                    if (cells[o.x][o.y].hasClass('ennemy')) {
                         o.action = 'attack';
                     }
-                    else if (cells[i][j].hasClass('step')) {
+                    else if (cells[o.x][o.y].hasClass('step')) {
                         o.action = 'step';
                     }
-                    else if (cells[i][j].hasClass('d-step')){
+                    /*
+                    else if (cells[o.x][o.y].hasClass('d-step')){
                         o.action = 'diagonal_step'
                     }
+                    */
                     ws.send(JSON.stringify(o));
             });
         }
