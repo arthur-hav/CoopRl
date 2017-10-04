@@ -44,3 +44,15 @@ waves = {
        }
 }
 
+terrain = {
+        "#": {
+            "can_walk_through":False, 
+            "can_see_through":False, 
+            "image":"img/Murs1.png"
+        },
+        "+": {
+            "can_walk_through":True, 
+            "can_see_through":False, 
+            "image":"img/Blokeur.png"
+        },
+}

@@ -104,8 +104,9 @@ class GameMap ():
         with open(path) as stream:
             jsyms = json.loads(stream.read())
             for k,v in jsyms.items():
-                for wall in v:
-                    self.entities[(wall[0], wall[1])].append(MapEntity(wall, can_walk_through=False, can_see_through=False, image="img/Murs1.png"))
+                defk = defs.terrain[k]
+                for xy in v:
+                    self.entities[(xy[0], xy[1])].append(MapEntity(xy, **defk))
 
 class MapEntity ():
     def __init__ (self, xy, can_walk_through=True, can_see_through=True, **kwargs):
@@ -217,21 +218,29 @@ class Item ():
                 "id":id(self),
                 "count":self.count
                 }
-    def equip (self, user):
-        if not self.definition["slot"] :
-            return False
+    def _equip (self, user):
+        if "slot" not in self.definition:
+            raise ActionFailure()
         if self.definition["slot"] in user.slots:
             user.slots[self.definition["slot"]].unequip(user)
         user.slots[self.definition["slot"]] = self
         user.items.remove(self)
         for key, val in self.definition["equip_delta"].items():
             user.__dict__[key] += val
-    def unequip (self, user):
+    def _unequip (self, user):
+        if "slot" not in self.definition:
+            raise ActionFailure()
+        if self.definition["slot"] not in user.slots:
+            raise ActionFailure()
         del user.slots[self.definition["slot"]]
         user.items.append(self)
         for key, val in self.definition["equip_delta"].items():
             user.__dict__[key] -= val
-       
+    def _apply (self, target):
+        if "apply" not in self.definition:
+            raise ActionFailure()
+        self.definition["apply"](self, target) 
+
 class Mob (Creature):
     def ai_find_pc (self, game_map):
         entities = self.get_visible_entities(game_map, 7)
@@ -245,11 +254,10 @@ class Mob (Creature):
                 return
 
     def ai_play (self, game_map):
-        if self.ap < 4:
+        if self.ap < 6:
             return
         pcxy = self.ai_find_pc (game_map)
         if not pcxy:
-            self.closest_step (game_map, (0,16))
             return
         if self.act (self.try_attack, (pcxy, game_map)):
             return
